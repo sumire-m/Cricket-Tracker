@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cricket Match Selector</title>
+  <link rel="stylesheet" href="matches-style.css">
+   <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+       <link
+      rel="stylesheet"
+      href="https://unpkg.com/swiper/swiper-bundle.min.css"
+    />
+</head>
+<body style="background-color:#111; color:#eee; font-family: sans-serif;">
+  <header>
+            <a href="#" class="logo">
+                <i class='bx  bx-cricket-ball'  style='color:#ffffff'></i>Cricket Tracker
+            </a>
+            <div class="bx bx-menu" id="menu-icon">
+
+            </div>
+            <!--Menu-->
+            <ul class="navbar">
+                <li><a href="index.html" class="home-active">Home</a></li>
+                <li><a href="#Matches" class="match-active">Matches</a></li>
+                <li><a href="team.html" class="team-active">Teams</a></li>
+                <li><a href="#News">News</a></li>
+                <li><a href="points.html" class="point-active">Points</a></li>
+            </ul>
+            <a href="#" class="btn">Sign In</a>
+        </header>
+  <h1>Choose Match</h1>
+  <select id="match-selector" style="padding: 10px; font-size: 16px; background-color: #222; color: #fff;"></select>
+
+  <!--<pre id="output" style="background: #000; color: lime; padding: 20px; margin-top: 20px;"></pre>-->
+
+  <div class="match-details">
+    <p><strong>Match:</strong> <span id="match-name"></span></p>
+    <p><strong>Status:</strong> <span id="match-status"></span></p>
+    <p><strong>Venue:</strong> <span id="match-venue"></span></p>
+    <p><strong>Date:</strong> <span id="match-date"></span></p>
+    <p><strong>Teams:</strong><span id="match-teams"></span></p>
+  </div>
+
+  <script>
+    async function getAllMatches() {
+      const apiKey = "57ee2d50-862c-4a5a-ad0a-daefc3f56b31";
+      const url = `https://api.cricapi.com/v1/currentMatches?apikey=${apiKey}`;
+
+      try {
+        const res = await fetch(url);
+        const json = await res.json();
+
+        const matches = json.data;
+        const select = document.getElementById('match-selector');
+        select.innerHTML = '';
+
+        matches.forEach(match => {
+          const option = document.createElement('option');
+          option.value = match.id;
+          option.textContent = match.name;
+          select.appendChild(option);
+        });
+
+        // Show selected match info
+        select.addEventListener('change', async () => {
+          const matchId = select.value;
+          const infoURL = `https://api.cricapi.com/v1/match_info?apikey=${apiKey}&id=${matchId}`;
+          const matchRes = await fetch(infoURL);
+          const matchData = await matchRes.json();
+          /*document.getElementById('output').textContent = JSON.stringify(matchData, null, 2);*/
+          document.getElementById("match-name").textContent = matchData.data.name;
+          document.getElementById("match-status").textContent = matchData.data.status;
+          document.getElementById("match-venue").textContent = matchData.data.venue;
+          document.getElementById("match-date").textContent = matchData.data.date;
+          document.getElementById("match-teams").textContent = matchData.data.teams.join(" vs ");
+        });
+
+      } catch (err) {
+        console.error("Baby, something broke 💔", err);
+      }
+    }
+
+    // Call it on page load
+    getAllMatches();
+    // Update the HTML with clean values
+    
+
+  </script>
+</body>
+</html>
